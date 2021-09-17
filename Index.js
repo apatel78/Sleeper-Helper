@@ -5,8 +5,11 @@ const fs = require('fs');
 //Standings
 (async () => {
 
+    const command_line_input = "Monarch"
+    const league_to_position = {"Monarch" : `0`, "RUFFLWhite" : '1'}
+
     const sleeper_instance = new sleeper_package.sleeper();
-    const league_ids = [`732852003943862272`];
+    const league_ids = [`732852003943862272`, '728306032106962944'];
 
     sleeper_instance.leagues = league_ids;
     await Promise.all(sleeper_instance.league_promises);
@@ -15,7 +18,7 @@ const fs = require('fs');
     var data = {};
 
     //Get Users for the league
-    data = await sleeper_instance.leagues[league_ids[0]].fetch_owners();
+    data = await sleeper_instance.leagues[league_ids[league_to_position[command_line_input]]].fetch_owners();
 
     for(const user of data.owners) {
         users_dict[user.user_id] = user.display_name;
@@ -24,7 +27,7 @@ const fs = require('fs');
     var roster_standings_list = [];
 
     //Get Rosters for the league
-    data = await sleeper_instance.leagues[league_ids[0]].fetch_rosters();
+    data = await sleeper_instance.leagues[league_ids[league_to_position[command_line_input]]].fetch_rosters();
     
     //Extract wanted data and push to a list
     for(const roster of data.rosters){
@@ -55,25 +58,27 @@ const fs = require('fs');
 //Matchups
 (async () => {
 
+    const command_line_input = "Monarch"
+    const week = 1;
+    const league_to_position = {"Monarch" : `0`, "RUFFLWhite" : '1'}
+
     const sleeper_instance = new sleeper_package.sleeper();
-    const league_ids = [`732852003943862272`];
+    const league_ids = [`732852003943862272`, '728306032106962944'];
 
     sleeper_instance.leagues = league_ids;
     await Promise.all(sleeper_instance.league_promises);
     
     var username_to_matchup = [];
     var data = {};
-    const week = 1;
-
 
     //Get Username and UserID combo
-    data = await sleeper_instance.leagues[league_ids[0]].fetch_owners();
+    data = await sleeper_instance.leagues[league_ids[league_to_position[command_line_input]]].fetch_owners();
     for(const datum of data.owners) {
         username_to_matchup.push([datum.display_name, datum.user_id, 0])
     }
     
     //Get UserID and RosterID combo
-    data = await sleeper_instance.leagues[league_ids[0]].fetch_rosters();
+    data = await sleeper_instance.leagues[league_ids[league_to_position[command_line_input]]].fetch_rosters();
     for(const datum of data.rosters) {
         for(let i = 0; i < username_to_matchup.length; i++){
             if(username_to_matchup[i][1] == datum.owner_id) {
@@ -83,7 +88,7 @@ const fs = require('fs');
     }
     
     //Get matchup and RosterID combo
-    data = await sleeper_instance.leagues[league_ids[0]].fetch_matchups(week);
+    data = await sleeper_instance.leagues[league_ids[league_to_position[command_line_input]]].fetch_matchups(week);
     for(const datum of data.matchups) {
         for(let i = 0; i < username_to_matchup.length; i++){
             if(username_to_matchup[i][1] == datum.roster_id) {
