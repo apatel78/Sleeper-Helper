@@ -19,7 +19,6 @@ const fs = require('fs');
 
     //Get Users for the league
     data = await sleeper_instance.leagues[league_ids[league_to_position[command_line_input]]].fetch_owners();
-
     for(const user of data.owners) {
         users_dict[user.user_id] = user.display_name;
     }
@@ -28,7 +27,6 @@ const fs = require('fs');
 
     //Get Rosters for the league
     data = await sleeper_instance.leagues[league_ids[league_to_position[command_line_input]]].fetch_rosters();
-    
     //Extract wanted data and push to a list
     for(const roster of data.rosters){
         const wins = roster["settings"]["wins"];
