@@ -1,5 +1,26 @@
 {
+  "name": "sleeperdiscordbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "sleeper_fantasy": "^1.0.2"
+    "danfojs-node": "^0.2.8",
+    "discord.js": "^13.1.0",
+    "dotenv": "^10.0.0",
+    "es6-promise": "^4.2.8",
+    "isomorphic-fetch": "^3.0.0",
+    "sleeper_fantasy": "^1.0.2",
+    "string-table": "^0.1.5",
+    "table": "^6.7.1",
+    "wokcommands": "^1.3.983"
+  },
+  "devDependencies": {
+    "ts-node": "^10.2.1"
   }
 }
