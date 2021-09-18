@@ -1,5 +1,6 @@
 import { ICommand } from "wokcommands";
 import DiscordJS, { Intents, MessageEmbed, SelectMenuInteraction } from 'discord.js'
+import * as table from 'table'
 
 const sleeper_package = require('sleeper_fantasy');
 const fs = require('fs');
@@ -72,49 +73,73 @@ export default {
         for(const datum of data.matchups) {
             for(let i = 0; i < username_to_matchup.length; i++){
                 if(username_to_matchup[i][1] == datum.roster_id) {
-                    if(String(datum.points).includes('.')) {
-                        username_to_matchup[i][1] = datum.points;
-                    }
-                    else {
-                        username_to_matchup[i][1] = datum.points.toFixed(2);
-                    }
+                    username_to_matchup[i][1] = datum.points;
                     username_to_matchup[i][2] = datum.matchup_id;
                 }
             }
         }
         
         
-        //Delete all unassigned teams
-        for(let i = 0; i < username_to_matchup.length; i++){
-            username_to_matchup[i][1] = String(username_to_matchup[i][1]);
-            if(!username_to_matchup[i][1].includes('.')) {
-                delete username_to_matchup[i];
-            }
-            try{
-                username_to_matchup[i][1] = parseFloat(username_to_matchup[i][1]); 
-            }
-            catch {}
-        }
-        
-        //Sort Matchups (Matchup Number first, Points second)
-        username_to_matchup.sort(function(a,b){
-            if(a[2] == b[2]){
-                return a[1] < b[1] ? 1 : a[1] > b[1] ? -1 : 0;
-            }
-            return a[2] < b[2] ? 1 : -1;
-        });
+        const usernameMatches = username_to_matchup
+            .filter(matchup => typeof matchup[1] === 'number')
+            .sort((a, b) => {
+                if (a[2] === b[2]) return b[1] - a[1];
+                return a[2] - b[2];
+            });
 
-        var output_string = ""
-        for(let i = 0; i < username_to_matchup.length; i = i + 2) {
-            output_string = output_string + username_to_matchup[i][0] + 
-            " (" + username_to_matchup[i][1] + ") " +
-            "vs " + username_to_matchup[i+1][0] +
-            " (" + username_to_matchup[i+1][1] + ") \n"
+        //Create a new Array to hold data
+        let username_to_matchup_output : any = [];
+        var longest_username = 0
+        
+        for(let i = 0; i < usernameMatches.length; i = i + 2) {
+            const input = [usernameMatches[i][0], 
+            "(" + usernameMatches[i][1] + ")", "vs", "(" + usernameMatches[i+1][1] + ")",
+            usernameMatches[i+1][0]
+        ]
+            //Grab the longest username
+            if(usernameMatches[i][0].length > longest_username){
+            longest_username = usernameMatches[i][0].length
+            }
+            username_to_matchup_output.push(input)
         }
+
+        //Create a table from the data
+        const config = {
+            border: table.getBorderCharacters(`void`),
+            columns: [
+            {
+                width: longest_username,
+            },
+            {
+                width: 8,
+            },
+            {
+                width: 2,
+            },
+            {
+                width: 8,
+            },
+            {
+                width: longest_username,
+            },
+            ],
+            drawHorizontalLine: () => false,
+
+        };
+        const username_to_matchup_table = table.table(username_to_matchup_output, config)
+
+        
+        // let output_string = ""
+        // for (let i = 0; i < usernameMatches.length; i = i + 2) {
+        //     const leftTeam = usernameMatches[i];
+        //     const rightTeam = usernameMatches[i+1];
+
+        //     output_string += `${leftTeam[0]} (${leftTeam[1]}) vs ${rightTeam[0]} (${rightTeam[1]})\n`;
+        // }
       
       const embed = new MessageEmbed()
-        .setTitle(league_name + " League Standings")
-        .setDescription("```" + output_string + "```")
+        .setTitle(league_name + " Week " + week + " Scoreboard")
+        .setDescription("```" + username_to_matchup_table + "```")
       return embed
       
     }
